@@ -13,6 +13,9 @@ import json
 import os
 from pathlib import Path
 
+import time
+import csv
+
 class args:
     """
     This class contains configuration parameters for the vehicle counting system using the YOLO model and various tracking approaches.
@@ -91,8 +94,8 @@ class args:
                              - The last two values (-0.2, -0.1) represent the BOTTOM-RIGHT point of the included rectangle after masking. 
                                This point is 80% of the width and 90% of the height.
     """
-    source = "kech1.mp4"
-    name = "kech1"
+    source = "kech.mp4"
+    name = "kech"
     yolo_model = Path('yolov8n.pt')
     reid_model = Path("osnet_x0_25_msmt17.pt")
     tracking_method = "ocsort"
@@ -124,7 +127,7 @@ class args:
     use_mask = False
     visualize_masked_frames = True
     included_box = [0.1, 0.2, -0.2, -0.1]
-
+    save_csv_count = True
 
 
 class Annotator_for_counting(Annotator):
@@ -183,11 +186,12 @@ class counter_YOLO(YOLO):
         self.max_cls_index = max(list(args.classes))+1 if args.classes is not None else 80
         self.counter = 0
         self.count_per_class = 0
-        self.ids_set = set()
         self.ids_filtered = torch.tensor([])
+        self.cls_filtered = torch.tensor([])
         self.ids_frames = torch.tensor([])
-        self.id_to_first_last = {}
-        
+
+        self.count_record = []
+        self.ids_set = set()
 
         try:
             if args.counting_approach == "detection_only":
@@ -640,32 +644,42 @@ class counter_YOLO(YOLO):
         line_vicinity = None
         bboxs = boxes.xywh[:, :2]
         ids = boxes.id
+        # print(f"Ids: {ids}")
         
         if bboxs.numel() > 0 and ids is not None:
-            ids_ = torch.tensor([id_ not in self.ids_set for id_ in ids.numpy()], dtype=torch.bool)
+            ids_ = torch.tensor([id_ not in self.ids_set for id_ in ids.numpy()], dtype=torch.bool)   # which IDs in the current frame are not already present in the set self.ids_set.
             right_of_line1_vehicles = self.right_of_line["line1"](bboxs, intercept1, slope1)
             left_of_line2_vehicles = ~self.right_of_line["line2"](bboxs, intercept2, slope2)
             vehicles_between_two_lines = right_of_line1_vehicles & left_of_line2_vehicles
+            
+            # print(f"vehicles_between_two_lines: {vehicles_between_two_lines}")
+            
             indices = torch.nonzero(ids_ & vehicles_between_two_lines)
             ids_to_keep_track = ids[indices]
+            
             for id in ids_to_keep_track.view(-1):
                 self.ids_set.add(int(id))
     
             cls = boxes.cls.cpu().int()
-            cls = torch.eye(self.max_cls_index)[cls]
+            # print(f"cls is : {cls} with shape: {cls.shape}")
+            cls_ = torch.eye(self.max_cls_index)[cls]
+
             mask = ~ids_[:, None].expand(-1, self.max_cls_index)
-            masked_ids = torch.masked_fill(cls, mask, 0)
+            masked_ids = torch.masked_fill(cls_, mask, 0)
             mask = ~vehicles_between_two_lines[:, None].expand(-1, self.max_cls_index)
-            masked_between_two_lines = torch.masked_fill(cls, mask, 0)
+            masked_between_two_lines = torch.masked_fill(cls_, mask, 0)
             masked_count = torch.logical_and(masked_between_two_lines, masked_ids)
             self.count_per_class += torch.sum(masked_count, dim=0)
             self.counter += torch.sum(masked_count)
-    
+
             self.ids_filtered = ids[vehicles_between_two_lines]
+            self.cls_filtered = cls[vehicles_between_two_lines]
+
             ids_frame = torch.stack((self.ids_filtered, torch.full_like(self.ids_filtered, self.frame_number)), dim=1)
             self.ids_frames = torch.cat((self.ids_frames, ids_frame)).int()
-            self.id_to_first_last = self.id_to_first_last_frame(self.ids_frames)    
+            self.id_to_first_last = self.id_to_first_last_frame(self.ids_frames)
 
+    
     def id_to_first_last_frame(self, ids_frames):
         """
         Gets the first and last frame for each ID in the video.

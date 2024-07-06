@@ -666,6 +666,26 @@ class counter_YOLO(YOLO):
             self.ids_frames = torch.cat((self.ids_frames, ids_frame)).int()
             self.id_to_first_last = self.id_to_first_last_frame(self.ids_frames)    
 
+
+
+            
+            # Add this block to write to CSV
+            import csv 
+            current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            with open('vehicle_counts.csv', 'a', newline='') as csvfile:
+                fieldnames = ['time', 'ID_between_2_lines', 'class']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                
+                # Write the header only if the file is empty
+                if csvfile.tell() == 0:
+                    writer.writeheader()
+                
+                for id, cls_index in zip(self.ids_filtered, cls[ids_to_keep_track]):
+                    writer.writerow({'time': current_time, 'ID_between_2_lines': int(id), 'class': int(cls_index.argmax())})
+
+
+    
+
     def id_to_first_last_frame(self, ids_frames):
         """
         Gets the first and last frame for each ID in the video.
