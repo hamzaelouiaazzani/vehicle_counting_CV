@@ -103,7 +103,7 @@ def run(args):
     counter_yolo.predictor.setup_source(source if source is not None else counter_yolo.predictor.args.source)
 
     # Check if save_dir/ label file exists
-    if counter_yolo.predictor.args.save or counter_yolo.predictor.args.save_txt:
+    if counter_yolo.predictor.args.save or counter_yolo.predictor.args.save_txt or args.save_csv_count:
         (counter_yolo.predictor.save_dir / 'labels' if counter_yolo.predictor.args.save_txt else counter_yolo.predictor.save_dir).mkdir(parents=True, exist_ok=True)
 
     # Warmup model
@@ -115,17 +115,25 @@ def run(args):
     counter_yolo.predictor.run_callbacks('on_predict_start')
     
 
-    if args.save_csv_count:
+    if args.save_csv_count and args.counting_approach=="tracking_with_two_lines":
+
+            
         first_frame_epoch = 569030400000
-        csv_file_path = os.path.join(os.getcwd(), counter_yolo.predictor.save_dir.__str__(), 'vehicle_counts.csv')
+        csv_file_path = os.path.join(os.getcwd(), args.project, 'vehicle_counts.csv')
+        
+        # Delete the previous file if it exists
         if os.path.isfile(csv_file_path):
             os.remove(csv_file_path)
-        fieldnames = ['time (ms)', 'frame' , 'IDs', 'vehicle_type']
-        with open(csv_file_path, 'w', newline='') as csvfile:  # Change 'a' to 'w' to ensure the file is writable
+        
+        # Create a new file and write the header
+        fieldnames = ['time (ms)', 'frame', 'IDs', 'vehicle_type']
+        with open(csv_file_path, 'w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()       
+            writer.writeheader()
+
     
     results = []    
+    
     for batch in counter_yolo.predictor.dataset:
         counter_yolo.predictor.run_callbacks('on_predict_batch_start')
         counter_yolo.predictor.batch = batch
