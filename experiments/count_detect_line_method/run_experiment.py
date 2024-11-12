@@ -22,22 +22,23 @@ def tensor_to_dict(count_per_class):
     
     # Create the dictionary
     vehicle_counts = {vehicle: count_per_class[idx].item() for vehicle, idx in zip(vehicle_types, indices)}
+    
     return vehicle_counts
 
 def main(vid_strides):
-    
-    args.counting_approach = "tracking_with_line_crossing"
+    args.counting_approach = "detection_only"
     args.save = False
     args.verbose = False
     args.use_mask = False
     args.save_csv_count = False
-    args.tracking_method  = "ocsort"
-    
-    folder_path = os.path.join(os.getcwd(), "dataset_2")
+
+    folder_path = os.path.join(os.getcwd(), "dataset")
     videos = sorted([f for f in os.listdir(folder_path) if f.endswith('.mp4')])
     video_names = [f"kech{idx}.mp4" for idx in range(2, len(videos) + 2)]
-    lines_of_counting = list(pd.read_csv(os.path.join(os.getcwd(), "dataset_2", "actual_counts.csv"))["line_of_counting"].apply(ast.literal_eval))
+    lines_of_counting = list(pd.read_csv(os.path.join(os.getcwd(), "dataset", "actual_counts.csv"))["line_of_counting"].apply(ast.literal_eval))
     
+    line_vicinities = [0.2 , 0.1 , 0.05 , 0.01]
+
     
 
     for vid_stride in vid_strides:
@@ -47,41 +48,47 @@ def main(vid_strides):
         
         for video , line_of_counting in zip(video_names , lines_of_counting):
             print(f"video: {video}")
-            args.source = os.path.join(os.getcwd(), "dataset_2", video)
+            args.source = os.path.join(os.getcwd(), "dataset", video)
             dict_count, dict_runtime = {}, {}
 
+
             args.line_point11 , args.line_point12 = line_of_counting
-         
-        
-            counter_yolo, profilers, _ = run(args)
 
-            dict_count = {
-                "count_per_class": tensor_to_dict(counter_yolo.count_per_class),
-                "total_count": int(counter_yolo.counter)
-            }
-            dict_runtime = {
-                "Preprocessing": profilers[0].t,
-                "Detection": profilers[1].t,
-                "Postprocessing": profilers[2].t,
-                "Tracking" : profilers[3].t , 
-                "Counting": profilers[4].t
-            }
 
-            del counter_yolo, profilers
-            torch.cuda.empty_cache()
-            gc.collect()
+            for line_vicinity in line_vicinities:
+                print(f"line_vicinity: {line_vicinity}")
+
+                args.line_vicinity = line_vicinity
+                counter_yolo, profilers, _ = run(args)
+
+                dict_count[f"line_vicinity_{line_vicinity}"] = {
+                    "count_per_class": tensor_to_dict(counter_yolo.count_per_class),
+                    "total_count": int(counter_yolo.counter.item())
+                }
+                dict_runtime[f"line_vicinity_{line_vicinity}"] = {
+                    "Preprocessing": profilers[0].t,
+                    "Detection": profilers[1].t,
+                    "Postprocessing": profilers[2].t,
+                    "Counting": profilers[4].t
+                }
+
+                del counter_yolo, profilers
+                torch.cuda.empty_cache()
+                gc.collect()
 
             overall_results[video] = {"counting": dict_count, "processing time": dict_runtime}
 
-        path = os.path.join(os.getcwd(), "experiments", "Cropped_Videos_Experiments" , "approach_4" , "Systematic_Line_Counting" , f"ocsort_vid_stride_{vid_stride}_approach4.json")
+        path = os.path.join(os.getcwd(), "experiments" , "count_detect_line_method" , f"vid_stride_{vid_stride}.json")
+
+
         
         with open(path, 'w') as outfile:
             json.dump(overall_results, outfile)
-        print(f"File ocsort_vid_stride_{vid_stride}_approach4.json is saved!")
+        print(f"File vid_stride_{vid_stride}.json is saved!")
         
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run counting approach_4 experiment  for specified strides!")
-    parser.add_argument('--vid_strides', type=int, nargs='+', required=True, help='List of video strides to choose (e.g., 1 2)')
+    parser = argparse.ArgumentParser(description="Run counting with detection_only experiment for specified strides!")
+    parser.add_argument('--vid_strides', type=int, nargs='+', required=True, help='List of video strides to choose (e.g., 2 3)')
     t1 =time.time()
     args_parser = parser.parse_args()
     main(args_parser.vid_strides)

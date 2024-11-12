@@ -26,20 +26,18 @@ def tensor_to_dict(count_per_class):
     return vehicle_counts
 
 def main(vid_strides):
-    
-    args.counting_approach = "tracking_with_line_vicinity"
+    args.counting_approach = "detection_only"
     args.save = False
     args.verbose = False
     args.use_mask = False
     args.save_csv_count = False
-    args.tracking_method  = "ocsort"
-    
-    folder_path = os.path.join(os.getcwd(), "dataset_2")
+
+    folder_path = os.path.join(os.getcwd(), "dataset")
     videos = sorted([f for f in os.listdir(folder_path) if f.endswith('.mp4')])
     video_names = [f"kech{idx}.mp4" for idx in range(2, len(videos) + 2)]
-    lines_of_counting = list(pd.read_csv(os.path.join(os.getcwd(), "dataset_2", "actual_counts.csv"))["line_of_counting"].apply(ast.literal_eval))
+    lines_of_counting = list(pd.read_csv(os.path.join(os.getcwd(), "dataset", "actual_counts.csv"))["line_of_counting"].apply(ast.literal_eval))
     
-    line_vicinities = [2 , 1.5 , 1 , 0.5]
+    line_vicinities = [0.2 , 0.1 , 0.05 , 0.01]
 
     
 
@@ -50,12 +48,13 @@ def main(vid_strides):
         
         for video , line_of_counting in zip(video_names , lines_of_counting):
             print(f"video: {video}")
-            args.source = os.path.join(os.getcwd(), "dataset_2", video)
+            args.source = os.path.join(os.getcwd(), "dataset", video)
             dict_count, dict_runtime = {}, {}
 
+
             args.line_point11 , args.line_point12 = line_of_counting
-         
-            
+
+
             for line_vicinity in line_vicinities:
                 print(f"line_vicinity: {line_vicinity}")
 
@@ -70,7 +69,6 @@ def main(vid_strides):
                     "Preprocessing": profilers[0].t,
                     "Detection": profilers[1].t,
                     "Postprocessing": profilers[2].t,
-                    "Tracking" : profilers[3].t , 
                     "Counting": profilers[4].t
                 }
 
@@ -80,15 +78,17 @@ def main(vid_strides):
 
             overall_results[video] = {"counting": dict_count, "processing time": dict_runtime}
 
-        path = os.path.join(os.getcwd(), "experiments", "Cropped_Videos_Experiments" , "approach_3" , "Systematic_Line_Counting" , f"ocsort_vid_stride_{vid_stride}_approach3.json")
+        path = os.path.join(os.getcwd(), "experiments" , "count_detect_line_method" , f"vid_stride_{vid_stride}.json")
+
+
         
         with open(path, 'w') as outfile:
             json.dump(overall_results, outfile)
-        print(f"File ocsort_vid_stride_{vid_stride}_approach3.json is saved!")
+        print(f"File vid_stride_{vid_stride}.json is saved!")
         
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run counting approach_3 experiment  for specified strides!")
-    parser.add_argument('--vid_strides', type=int, nargs='+', required=True, help='List of video strides to choose (e.g., 1 2)')
+    parser = argparse.ArgumentParser(description="Run counting with detection_only experiment for specified strides!")
+    parser.add_argument('--vid_strides', type=int, nargs='+', required=True, help='List of video strides to choose (e.g., 2 3)')
     t1 =time.time()
     args_parser = parser.parse_args()
     main(args_parser.vid_strides)

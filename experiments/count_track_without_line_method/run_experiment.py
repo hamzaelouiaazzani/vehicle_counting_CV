@@ -29,7 +29,7 @@ def main(trackers):
     args.use_mask = False
     args.save_csv_count = False
 
-    folder_path = os.path.join(os.getcwd(), "dataset_2")
+    folder_path = os.path.join(os.getcwd(), "dataset")
     videos = sorted([f for f in os.listdir(folder_path) if f.endswith('.mp4')])
     video_names = [f"kech{idx}.mp4" for idx in range(2, len(videos) + 2)]
     strides = [1, 2, 3, 4]
@@ -47,7 +47,7 @@ def main(trackers):
         for video in video_names:
             
             print(f"video: {video}")
-            args.source = os.path.join(os.getcwd(), "dataset_2", video)
+            args.source = os.path.join(os.getcwd(), "dataset", video)
             dict_count, dict_runtime = {}, {}
     
             for stride in strides:
@@ -66,16 +66,16 @@ def main(trackers):
                 
             overall_results[video] = {"counting": dict_count, "processing time": dict_runtime}
     
-        path = os.path.join(os.getcwd(), "experiments" , "Cropped_Videos_Experiments" , "approach_2" , f"{tracker_name}_approach2.json")
+        path = os.path.join(os.getcwd(), "experiments" , "count_track_without_line_method" , f"{tracker_name}.json")
         with open(path, 'w') as outfile:
             json.dump(overall_results, outfile)
 
-        print(f"File {tracker_name}_approach2.json is saved in path {path}!")
+        print(f"File {tracker_name}.json is saved in path {path}!")
 
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run counting approach_2 experiment for a specified tracker")
+    parser = argparse.ArgumentParser(description="Run counting tracking_without_line experiment for a specified tracker")
     parser.add_argument('--trackers', type=str, nargs='+', required=True, help='List of the trackers (e.g., botsort, deepocsort, etc.)')
     
     args_parser = parser.parse_args()

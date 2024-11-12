@@ -198,7 +198,7 @@ class counter_YOLO(YOLO):
 
         try:
             if args.counting_approach == "detection_only":
-                print("You are following the detection only in the vicinity of a given line approach.")
+                print("You are using the Detection-based Counting Method in the Vicinity of a Line!")
 
                 self.counting_attributes["counting_approach"] = "detection_only"
                 self.counting_attributes["with_track"], self.counting_attributes["with_line"] = False, True
@@ -218,7 +218,7 @@ class counter_YOLO(YOLO):
                 self.pipeline_function = self.pipeline_without_tracking
 
             elif args.counting_approach == "tracking_without_line":
-                print("You are following the detection&tracking over the whole frame spatial information approach.")
+                print("You are using the Tracking-based Counting Method Without Line Reference!")
 
                 self.counting_attributes["counting_approach"] = "tracking_without_line"
                 self.counting_attributes["with_track"], self.counting_attributes["with_line"] = True, False
@@ -233,8 +233,22 @@ class counter_YOLO(YOLO):
                 self.pipeline_function = self.pipeline_with_tracking
 
             elif args.counting_approach == "tracking_with_line_vicinity" or args.counting_approach == "tracking_with_line_crossing" or args.counting_approach == "tracking_with_line_crossing_vicinity":
-                print("You are following the detection&tracking in the vicinity of pre-defined line approach.")
+
+                if args.counting_approach == "tracking_with_line_vicinity":
+                    print("You are using the Tracking-Based Counting Method in the Vicinity of a pre-defined Line!")
+                    self.counting_attributes["line_vicinity"] = args.line_vicinity
+                    self.set_counting_function(self.count_track_line_vicinity)
                     
+                elif args.counting_approach == "tracking_with_line_crossing": 
+                    print("You are using the Tracking-Based Counting Method With Crossing of a pre-defined Line!")
+                    self.counting_attributes["line_vicinity"] = None
+                    self.set_counting_function(self.count_track_line_crossing)
+                    
+                elif args.counting_approach == "tracking_with_line_crossing_vicinity":
+                    print("You are using the Tracking-Based Counting Method With Crossing in vicinity of a pre-defined Line!")
+                    self.counting_attributes["line_vicinity"] = args.line_vicinity
+                    self.set_counting_function(self.count_track_line_crossing_vicinity)
+             
                 self.counting_attributes["counting_approach"] = args.counting_approach
                 self.counting_attributes["with_track"], self.counting_attributes["with_line"] = True, True
                 self.counting_attributes["line_point11"], self.counting_attributes["line_point12"] = args.line_point11, args.line_point12
@@ -248,18 +262,6 @@ class counter_YOLO(YOLO):
                     self.slope_intercept_without_mask("1")
                 
                 self.pipeline_function = self.pipeline_with_tracking
-
-                if args.counting_approach == "tracking_with_line_vicinity":
-                    self.counting_attributes["line_vicinity"] = args.line_vicinity
-                    self.set_counting_function(self.count_track_line_vicinity)
-
-                elif args.counting_approach == "tracking_with_line_crossing": 
-                    self.counting_attributes["line_vicinity"] = None
-                    self.set_counting_function(self.count_track_line_crossing)
-                    
-                elif args.counting_approach == "tracking_with_line_crossing_vicinity":
-                    self.counting_attributes["line_vicinity"] = args.line_vicinity
-                    self.set_counting_function(self.count_track_line_crossing_vicinity)
                                   
                 
             elif args.counting_approach == "tracking_with_two_lines":
@@ -294,7 +296,7 @@ class counter_YOLO(YOLO):
                 self.set_counting_function(self.count_track_two_lines)
                 
             else:
-                raise ValueError("Please make sure you have chosen one of the three available counting approaches via one of the following strings: detection_only_approach, tracking_without_line, or tracking_with_line")
+                raise ValueError("Please make sure you have chosen one of the available counting approaches!")
                 
         except ValueError as e:
             print("Error:", e)
