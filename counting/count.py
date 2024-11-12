@@ -68,7 +68,7 @@ class args:
                           Default is True.
         verbose (bool): Whether to enable verbose logging.
                         Default is False.
-        counting_approach (str): Approach for counting vehicles. Options include 'detection_only', 'tracking_without_line', 'tracking_with_line', 'tracking_with_two_lines'.
+        counting_approach (str): Approach for counting vehicles. Options include 'detection_only', 'tracking_without_line', 'tracking_with_line_vicinity', tracking_with_line_crossing, 'tracking_with_two_lines'.
                                  Default is 'tracking_with_two_lines'.
         line_point11 (tuple): Coordinates of the first point of the first line. Values between 0 and 1 indicate percentages.
                               For example, (0.4, 0.0) means 40% of the frame width (pixel 0.4 * image width) and 0% of the frame height (pixel 0).
@@ -185,11 +185,14 @@ class counter_YOLO(YOLO):
         
         self.max_cls_index = max(list(args.classes))+1 if args.classes is not None else 80
         self.counter = 0
-        self.count_per_class = 0
+        self.count_per_class = torch.zeros(self.max_cls_index)  
         self.ids_filtered = torch.tensor([])
         self.cls_filtered = torch.tensor([])
         self.ids_frames = torch.tensor([])
-
+        #cross line
+        self.prev_dets = {}   
+        self.counted_ids = set()
+        
         self.count_record = []
         self.ids_set = set()
 
@@ -229,14 +232,12 @@ class counter_YOLO(YOLO):
                 self.set_counting_function(self.count_track_noline)
                 self.pipeline_function = self.pipeline_with_tracking
 
-            elif args.counting_approach == "tracking_with_line":
+            elif args.counting_approach == "tracking_with_line_vicinity" or args.counting_approach == "tracking_with_line_crossing" or args.counting_approach == "tracking_with_line_crossing_vicinity":
                 print("You are following the detection&tracking in the vicinity of pre-defined line approach.")
-
+                    
                 self.counting_attributes["counting_approach"] = args.counting_approach
                 self.counting_attributes["with_track"], self.counting_attributes["with_line"] = True, True
                 self.counting_attributes["line_point11"], self.counting_attributes["line_point12"] = args.line_point11, args.line_point12
-                
-                self.counting_attributes["line_vicinity"] = args.line_vicinity
 
                 self.counting_preprocess["use_mask"] = args.use_mask
                 if args.use_mask:
@@ -247,7 +248,19 @@ class counter_YOLO(YOLO):
                     self.slope_intercept_without_mask("1")
                 
                 self.pipeline_function = self.pipeline_with_tracking
-                self.set_counting_function(self.count_track_line)   
+
+                if args.counting_approach == "tracking_with_line_vicinity":
+                    self.counting_attributes["line_vicinity"] = args.line_vicinity
+                    self.set_counting_function(self.count_track_line_vicinity)
+
+                elif args.counting_approach == "tracking_with_line_crossing": 
+                    self.counting_attributes["line_vicinity"] = None
+                    self.set_counting_function(self.count_track_line_crossing)
+                    
+                elif args.counting_approach == "tracking_with_line_crossing_vicinity":
+                    self.counting_attributes["line_vicinity"] = args.line_vicinity
+                    self.set_counting_function(self.count_track_line_crossing_vicinity)
+                                  
                 
             elif args.counting_approach == "tracking_with_two_lines":
                 print("You are following the detection&tracking with two lines approach.")
@@ -558,10 +571,11 @@ class counter_YOLO(YOLO):
         bboxs = boxes.xywh[:, :2]
         
         if bboxs.numel() > 0:
-            dist = self.distance_function(bbox=bboxs, intercept=intercept1, slope=slope1) < line_vicinity * torch.max(boxes.xywh[:, 2], boxes.xywh[:, 3])
+            dist = self.distance_function(bbox=bboxs, intercept=intercept1, slope=slope1) < line_vicinity * torch.min(boxes.xywh[:, 2], boxes.xywh[:, 3])
             cls = boxes.cls.cpu().int()
             cls = torch.eye(self.max_cls_index)[cls]
-            mask = ~dist[:, None].expand(-1, self.max_cls_index)
+            mask = ~dist[:, None].expand(-1, self.max_cls_index).to(cls.device)
+            
             masked_cls = torch.masked_fill(cls, mask, 0) 
             self.count_per_class += torch.sum(masked_cls, dim=0)
             self.counter += torch.sum(masked_cls)
@@ -596,7 +610,7 @@ class counter_YOLO(YOLO):
             self.count_per_class += torch.sum(masked_ids, dim=0)
             self.counter += torch.sum(masked_ids)
 
-    def count_track_line(self, boxes, intercept1, slope1, line_vicinity, intercept2=None, slope2=None):
+    def count_track_line_vicinity(self, boxes, intercept1, slope1, line_vicinity, intercept2=None, slope2=None):
         """
         Counts vehicles using tracking in the vicinity of a line.
 
@@ -629,6 +643,113 @@ class counter_YOLO(YOLO):
             self.count_per_class += torch.sum(masked_count, dim=0)
             self.counter += torch.sum(masked_count)
 
+
+    def count_track_line_crossing(self, boxes, intercept1 = None, slope1 = None, line_vicinity=None, intercept2=None, slope2=None):
+        """
+        Counts vehicles using tracking by detecting when they cross a predefined line.
+    
+        Args:
+            boxes: Detected bounding boxes with tracking IDs.
+        """
+        # Unpack line points
+        (xA, yA), (xB, yB) = self.counting_attributes["line_point11"] , self.counting_attributes["line_point12"]
+        # Extract centers of bounding boxes and IDs
+        bboxs = boxes.xywh[:, :2]  # Centers of bounding boxes  
+        ids = boxes.id  # Tracking IDs
+        classes = boxes.cls.cpu().int()  # Class labels
+    
+        if bboxs.numel() > 0 and ids is not None:
+            # Loop over each detection
+            for center, obj_id, cls in zip(bboxs, ids, classes):
+                xC, yC = center.cpu().numpy()
+                obj_id = int(obj_id)
+                cls = int(cls)
+    
+                # Calculate current determinant
+                det = (xB - xA) * (yC - yA) - (yB - yA) * (xC - xA)
+    
+                # Get previous determinant for this object
+                prev_det = self.prev_dets.get(obj_id, None)
+    
+                # Update the current determinant
+                self.prev_dets[obj_id] = det
+    
+                if prev_det is not None:
+                    # Check if determinant sign has changed
+                    if det * prev_det < 0:
+                        # Vehicle has crossed the line
+                        if obj_id not in self.counted_ids:
+                            self.counted_ids.add(obj_id)
+                            # Update counts
+                            cls_one_hot = torch.zeros(self.max_cls_index)
+                            cls_one_hot[cls] = 1
+                            self.count_per_class += cls_one_hot
+                            self.counter += 1
+    
+    def count_track_line_crossing_vicinity(self, boxes, intercept1, slope1, line_vicinity, intercept2=None, slope2=None):
+        """
+        Counts vehicles using tracking by detecting when they cross a predefined line
+        and ensuring the distance from the center of the vehicle to the line is less than a threshold.
+        
+        Args:
+            boxes: Detected bounding boxes with tracking IDs.
+            intercept1: Intercept of the first line.
+            slope1: Slope of the first line.
+            line_vicinity: Vicinity threshold for counting based on distance.
+        """
+        # Unpack line points
+        (xA, yA), (xB, yB) = self.counting_attributes["line_point11"], self.counting_attributes["line_point12"]
+        
+        # Extract centers of bounding boxes and IDs
+        bboxs = boxes.xywh[:, :2]  # Centers of bounding boxes
+        ids = boxes.id  # Tracking IDs
+        ws = boxes.xywh[:, 2]  # widths
+        hs = boxes.xywh[:, 3]  # heights
+        classes = boxes.cls.cpu().int()  # Class labels
+        
+        if bboxs.numel() > 0 and ids is not None:
+            # Loop over each detection
+            for center, w, h, obj_id, cls in zip(bboxs, ws, hs, ids, classes):
+                xC, yC = center.cpu().numpy()
+                obj_id = int(obj_id)
+                cls = int(cls)
+    
+                # Calculate current determinant (crossing check)
+                det = (xB - xA) * (yC - yA) - (yB - yA) * (xC - xA)
+                
+                # Reshape the center to (1, 2) to ensure it is treated as 2D
+                center_reshaped = center.unsqueeze(0)  # Ensuring it has a shape of (1, 2)
+                
+                # Calculate the distance from the center of the vehicle to the line
+                distance = self.distance_function(bbox=center_reshaped, intercept=intercept1, slope=slope1)
+                
+                # Use max of width or height for the threshold comparison
+                box_size = max(w.item(), h.item())  
+                # box_size = max(self.video_attributes["width"], self.video_attributes["height"])
+                
+                # Check if the vehicle is within the vicinity of the line
+                if distance < line_vicinity * box_size:
+                    # Get previous determinant for this object (crossing detection)
+                    prev_det = self.prev_dets.get(obj_id, None)
+        
+                    # Update the current determinant
+                    self.prev_dets[obj_id] = det
+        
+                    if prev_det is not None:
+                        # Check if determinant sign has changed (crossing detection)
+                        if det * prev_det < 0:
+                            # Vehicle has crossed the line and is within the vicinity
+                            if obj_id not in self.counted_ids:
+                                self.counted_ids.add(obj_id)
+                                # Update counts
+                                cls_one_hot = torch.zeros(self.max_cls_index)
+                                cls_one_hot[cls] = 1
+                                self.count_per_class += cls_one_hot
+                                self.counter += 1
+    
+    
+        
+        
     def count_track_two_lines(self, boxes, intercept1, slope1, line_vicinity, intercept2, slope2):
         """
         Counts vehicles using tracking with two lines.

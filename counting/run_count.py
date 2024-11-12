@@ -186,7 +186,7 @@ def run(args):
             
 
 
-            if args.save_csv_count:
+            if args.save_csv_count and args.counting_approach=="tracking_with_two_lines":
 
                 current_time = (counter_yolo.frame_number/counter_yolo.video_attributes["frame_rate"])*1000 + first_frame_epoch
 
