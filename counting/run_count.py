@@ -4,10 +4,6 @@ import cv2
 from boxmot import TRACKERS
 from boxmot.tracker_zoo import create_tracker
 from boxmot.utils import ROOT
-from boxmot.utils.checks import TestRequirements
-
-__tr = TestRequirements()
-__tr.check_packages(('ultralytics @ git+https://github.com/mikel-brostrom/ultralytics.git', ))  # install
 
 from counting.count import counter_YOLO
 
