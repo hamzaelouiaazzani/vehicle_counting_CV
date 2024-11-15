@@ -68,8 +68,8 @@ class args:
                           Default is True.
         verbose (bool): Whether to enable verbose logging.
                         Default is False.
-        counting_approach (str): Approach for counting vehicles. Options include 'detection_only', 'tracking_without_line', 'tracking_with_line_vicinity', tracking_with_line_crossing, 'tracking_with_two_lines'.
-                                 Default is 'tracking_with_two_lines'.
+        counting_approach (str): Approach for counting vehicles. Options include 'detection_only', 'tracking_without_line', 'tracking_with_line_vicinity', 'tracking_with_line_crossing', 'tracking_with_line_crossing_vicinity' ,  'tracking_with_two_lines'.
+                                 Default is 'tracking_with_line_vicinity'.
         line_point11 (tuple): Coordinates of the first point of the first line. Values between 0 and 1 indicate percentages.
                               For example, (0.4, 0.0) means 40% of the frame width (pixel 0.4 * image width) and 0% of the frame height (pixel 0).
                               When masking the video frames with included_box, it becomes 0.4 * new width after mask.
@@ -118,7 +118,7 @@ class args:
     line_width = None
     per_class = True
     verbose = False
-    counting_approach = "tracking_with_two_lines"
+    counting_approach = "tracking_with_line_vicinity"
     line_point11 = (0.4, 0.0)
     line_point12 = (0.3, 1.0)
     line_vicinity = 0.01
@@ -127,7 +127,7 @@ class args:
     use_mask = False
     visualize_masked_frames = True
     included_box = [0.1, 0.2, -0.2, -0.1]
-    save_csv_count = True
+    save_csv_count = False
 
 
 class Annotator_for_counting(Annotator):

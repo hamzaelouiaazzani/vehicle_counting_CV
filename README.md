@@ -12,7 +12,8 @@ If you prefer working with Colab notebooks, kindly click on the icon below to op
 1. After the notebook opens, navigate to the top menu and select **Runtime** > **Change runtime type**.
 2. In the popup window, set **Hardware accelerator** to **GPU**.
 3. If available, select **T4** as the GPU type.
-4. Follow the instructions of the notebook. Feel Free to explore the code and Make any customizations for you. The notebook is designed for you for this.
+
+Follow the instructions of the notebook. Feel Free to explore the code and Make any customizations for you. The notebook is designed for you for this!
 
 
 ## 1.2. Jupyter Notebooks
@@ -24,97 +25,136 @@ Open a Bash or Anaconda Prompt and run the following commands to create and acti
 conda create --name vehicle_counter python=3.8
 conda activate vehicle_counter
 ```
+This step assumes you have already installed Anaconda in your computer
 
-> **Note:** You can neglect the above two instructions if you don't want working in a virtual envirenement.
+> **Note:** You can neglect the above two instructions if you are NOT working in a virtual envirenement.
 
 ### Step 2: Upgrade pip and Install Dependencies
-Download/clone the repository and run the following cell to upgrade pip, setuptools, and wheel, and install the repository dependencies.
+Clone the repository and ensure that vehicle_counting_CV is set as your working directory if you haven't done so already.
 
+```python
+!git clone https://github.com/hamzaelouiaazzani/vehicle_counting_CV.git
+```
+
+### Step 3: Upgrade pip and Install Dependencies
+Download/clone the repository and run the following cell to upgrade pip, setuptools, and wheel, and install the repository dependencies.
 
 ```python
 !pip install --upgrade pip setuptools wheel
 !pip install -e .
 ```
+> **Note:** Once you run this cell, comment it out and do not run it again because the packages are already installed in your environment.
 
-> **Note:** Once you run this cell, comment it out and do not run it again because the packages are already installed in the environment.
-
-### Step 3: Verify Torch Installation
-Run the following cell to verify the installation of PyTorch and check if CUDA is available.
-
+### Step 4: Verify Torch Installation
+Run the following cell to confirm that NumPy version 1.24.4 is installed, PyTorch is set up, and CUDA is available for GPU support.
 
 ```python
-import torch
-if torch.cuda.is_available():
-    torch.cuda.get_device_properties(0).name
-torch.cuda.is_available()
-```
+import numpy as np
+print("NumPy Version:", np.__version__)
 
-### Step 4: Clear Output and Confirm Setup
-Run the following cell to clear the output and confirm the setup.
-
-
-```python
-from IPython.display import Image, clear_output  # to display images
-
+from IPython.display import Image, clear_output  # to display images in Jupyter notebooks
 clear_output()
-print(f"Setup complete. Using torch {torch.__version__} ({torch.cuda.get_device_properties(0).name if torch.cuda.is_available() else 'CPU'})")
+
+import torch
+print(f"Cuda availaibility: {torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    print(f"Setup complete. Using torch {torch.__version__} ({torch.cuda.get_device_properties(0).name if torch.cuda.is_available() else 'CPU'})")
 ```
 
 ### Step 5: Run counting
 
-Import counting files:
-
+**Import counting files:**
 
 ```python
 from counting.run_count import run
 from counting.count import args
 ```
 
-To print the documentation about the arguments:
-
+**Explore the arguments to configure your vehicle counting system, including the tracker, counting method, and other settings. Don't Worry, Most arguments are preset by default, so you don’t need to understand them all. However, feel free to adjust and test them for deeper exploration and customization:**
 
 ```python
 print(args.__doc__)
 ```
-
-Change the arguments as you want:
-
+**Now customize your settings and configurations and build your counting system:**
 
 ```python
+import os
 args.source = "kech.mp4"
-args.name = "kech"
-args.verbose = True
-args.save_csv_count = True
+args.name = "video_results_folder"
+args.counting_approach = "tracking_with_line_vicinity"         # tracking_with_line_vicinity , tracking_with_line_crossing, tracking_with_line_crossing_vicinity
+args.tracking_method = "ocsort"
+args.save=True
+args.verbose=True
+args.line_vicinity=1.5
+args.line_point11 = (0.0, 0.25)
+args.line_point12 = (1.0, 0.75)
 ```
 
-Run the counting process:
+**Run the counting process:**
 
 
 ```python
 # Run the counting algorithm
-counter_yolo , profilers , results  = run(args)
+counter_yolo , profilers , _  = run(args)
 ```
-
-if you prompt args.save to **True** please check the results saved in folder **\runs\count** that is going to be created.
-
+In the above python instruction:
 - counter_yolo: This object stores all information about the detector, tracking, and counting algorithms used.
 - profilers: This object contains the time taken by each phase of the pipeline for the given video: **Pre-processing----> Detection----> Post-processing----> Tracking----> Counting**.
 - results: This object contains the results of detection and tracking for different objects in the video.
 
-Extract informations:
+If args.save is set to *True* Your results will be saved as a video in runs\count\video_results_folder, which will be automatically generated when you run your vehicle counting system experiment. Feel free to view it this folder!
 
+**Extract information about the your video:**
 
 ```python
 # video attribues:
 counter_yolo.video_attributes
 ```
 
+**Show the vehicle counting system Results of your video:**
+
+**Total counts:**
 
 ```python
 # Counting Results
 print(f"The number of vehicles counted by the algorithm is: {counter_yolo.counter}")
-print(f"The number of vehicles per type counted by the algorithm is: {counter_yolo.count_per_class}")
 ```
+
+Counts per vehicle type:
+
+```python
+def tensor_to_dict(count_per_class):
+    # Dictionary keys for the selected vehicle types
+    vehicle_types = ["bicycle", "car", "motorcycle", "bus", "truck"]
+
+    # Indices corresponding to the vehicle types in the tensor
+    indices = [1, 2, 3, 5, 7]
+
+    # Create the dictionary
+    vehicle_counts = {vehicle: int(count_per_class[idx].item()) for vehicle, idx in zip(vehicle_types, indices)}
+
+    return vehicle_counts
+
+print(f"The number of vehicles per type counted by the algorithm is: {tensor_to_dict(counter_yolo.count_per_class)}")
+```
+
+**Measure the time taken by each phase of your vehicle counting systm's pipeline for the video:**
+
+```python
+print(f"The time required for the PRE-PROCESSING step is: {profilers[0].t} ")
+print(f"The time required for the DETECTION (Inference) step is: {profilers[1].t} ")
+print(f"The time required for the POS-PROCESSING step is: {profilers[2].t}")
+print(f"The time required for the TRACKING step is: {profilers[3].t}")
+print(f"The time required for the COUNTING step is: {profilers[4].t}")
+```
+
+```python
+print(f"The average time per frame required for the PRE-PROCESSING step is: {profilers[0].dt} ")
+print(f"The average time per frame required for the DETECTION (Inference) step is: {profilers[1].dt} ")
+print(f"The average time per frame required for the POS-PROCESSING step is: {profilers[2].dt}")
+print(f"The average time per frame required for the TRACKING step is: {profilers[3].dt}")
+print(f"The average time per frame required for the COUNTING step is: {profilers[4].dt}")
+```python
 
 ## 1.3. Bash/Linux Commands
 Follow these steps to set up and run the application via Bash/Linux commands.

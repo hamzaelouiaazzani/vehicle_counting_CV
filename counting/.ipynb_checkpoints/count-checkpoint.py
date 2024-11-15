@@ -68,8 +68,8 @@ class args:
                           Default is True.
         verbose (bool): Whether to enable verbose logging.
                         Default is False.
-        counting_approach (str): Approach for counting vehicles. Options include 'detection_only', 'tracking_without_line', 'tracking_with_line_vicinity', tracking_with_line_crossing, 'tracking_with_two_lines'.
-                                 Default is 'tracking_with_two_lines'.
+        counting_approach (str): Approach for counting vehicles. Options include 'detection_only', 'tracking_without_line', 'tracking_with_line_vicinity', 'tracking_with_line_crossing', 'tracking_with_line_crossing_vicinity' ,  'tracking_with_two_lines'.
+                                 Default is 'tracking_with_line_vicinity'.
         line_point11 (tuple): Coordinates of the first point of the first line. Values between 0 and 1 indicate percentages.
                               For example, (0.4, 0.0) means 40% of the frame width (pixel 0.4 * image width) and 0% of the frame height (pixel 0).
                               When masking the video frames with included_box, it becomes 0.4 * new width after mask.
@@ -118,7 +118,7 @@ class args:
     line_width = None
     per_class = True
     verbose = False
-    counting_approach = "tracking_with_two_lines"
+    counting_approach = "tracking_with_line_vicinity"
     line_point11 = (0.4, 0.0)
     line_point12 = (0.3, 1.0)
     line_vicinity = 0.01
@@ -127,7 +127,7 @@ class args:
     use_mask = False
     visualize_masked_frames = True
     included_box = [0.1, 0.2, -0.2, -0.1]
-    save_csv_count = True
+    save_csv_count = False
 
 
 class Annotator_for_counting(Annotator):
@@ -198,7 +198,7 @@ class counter_YOLO(YOLO):
 
         try:
             if args.counting_approach == "detection_only":
-                print("You are using the Detection-based Counting Method in the Vicinity of a Line!")
+                print("You are following the detection only in the vicinity of a given line approach.")
 
                 self.counting_attributes["counting_approach"] = "detection_only"
                 self.counting_attributes["with_track"], self.counting_attributes["with_line"] = False, True
@@ -218,7 +218,7 @@ class counter_YOLO(YOLO):
                 self.pipeline_function = self.pipeline_without_tracking
 
             elif args.counting_approach == "tracking_without_line":
-                print("You are using the Tracking-based Counting Method Without Line Reference!")
+                print("You are following the detection&tracking over the whole frame spatial information approach.")
 
                 self.counting_attributes["counting_approach"] = "tracking_without_line"
                 self.counting_attributes["with_track"], self.counting_attributes["with_line"] = True, False
@@ -233,22 +233,8 @@ class counter_YOLO(YOLO):
                 self.pipeline_function = self.pipeline_with_tracking
 
             elif args.counting_approach == "tracking_with_line_vicinity" or args.counting_approach == "tracking_with_line_crossing" or args.counting_approach == "tracking_with_line_crossing_vicinity":
-
-                if args.counting_approach == "tracking_with_line_vicinity":
-                    print("You are using the Tracking-Based Counting Method in the Vicinity of a pre-defined Line!")
-                    self.counting_attributes["line_vicinity"] = args.line_vicinity
-                    self.set_counting_function(self.count_track_line_vicinity)
+                print("You are following the detection&tracking in the vicinity of pre-defined line approach.")
                     
-                elif args.counting_approach == "tracking_with_line_crossing": 
-                    print("You are using the Tracking-Based Counting Method With Crossing of a pre-defined Line!")
-                    self.counting_attributes["line_vicinity"] = None
-                    self.set_counting_function(self.count_track_line_crossing)
-                    
-                elif args.counting_approach == "tracking_with_line_crossing_vicinity":
-                    print("You are using the Tracking-Based Counting Method With Crossing in vicinity of a pre-defined Line!")
-                    self.counting_attributes["line_vicinity"] = args.line_vicinity
-                    self.set_counting_function(self.count_track_line_crossing_vicinity)
-             
                 self.counting_attributes["counting_approach"] = args.counting_approach
                 self.counting_attributes["with_track"], self.counting_attributes["with_line"] = True, True
                 self.counting_attributes["line_point11"], self.counting_attributes["line_point12"] = args.line_point11, args.line_point12
@@ -262,6 +248,18 @@ class counter_YOLO(YOLO):
                     self.slope_intercept_without_mask("1")
                 
                 self.pipeline_function = self.pipeline_with_tracking
+
+                if args.counting_approach == "tracking_with_line_vicinity":
+                    self.counting_attributes["line_vicinity"] = args.line_vicinity
+                    self.set_counting_function(self.count_track_line_vicinity)
+
+                elif args.counting_approach == "tracking_with_line_crossing": 
+                    self.counting_attributes["line_vicinity"] = None
+                    self.set_counting_function(self.count_track_line_crossing)
+                    
+                elif args.counting_approach == "tracking_with_line_crossing_vicinity":
+                    self.counting_attributes["line_vicinity"] = args.line_vicinity
+                    self.set_counting_function(self.count_track_line_crossing_vicinity)
                                   
                 
             elif args.counting_approach == "tracking_with_two_lines":
@@ -296,7 +294,7 @@ class counter_YOLO(YOLO):
                 self.set_counting_function(self.count_track_two_lines)
                 
             else:
-                raise ValueError("Please make sure you have chosen one of the available counting approaches!")
+                raise ValueError("Please make sure you have chosen one of the three available counting approaches via one of the following strings: detection_only_approach, tracking_without_line, or tracking_with_line")
                 
         except ValueError as e:
             print("Error:", e)
