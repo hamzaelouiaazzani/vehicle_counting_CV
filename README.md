@@ -156,6 +156,7 @@ print(f"The average time per frame required for the TRACKING step is: {profilers
 print(f"The average time per frame required for the COUNTING step is: {profilers[4].dt}")
 ```
 
+
 ## 1.3. Bash/Linux Commands
 Follow these steps to set up and run the application via Bash/Linux commands.
 
