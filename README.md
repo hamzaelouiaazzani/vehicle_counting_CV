@@ -353,9 +353,3 @@ This approach extends the `tracking_with_line` method. Instead of tracking vehic
 - Define the two reference lines using `args.line_point11`, `args.line_point12`, `args.line_point21`, and `args.line_point22`.
 
 This approach combines the strengths of the `tracking_with_line` method while enabling speed estimation, making it suitable for complex road traffic environments.
-
-
-
-```python
-
-```
