@@ -13,7 +13,7 @@ If you prefer working with Colab notebooks, kindly click on the icon below to op
 2. In the popup window, set **Hardware accelerator** to **GPU**.
 3. If available, select **T4** as the GPU type.
 
-Follow the instructions of the notebook. Feel Free to explore the code and Make any customizations for you. The notebook is designed for you for this!
+Follow the instructions of the notebook. Feel Free to explore the code and make any customizations for you. The notebook is designed for you for this!
 
 
 ## 1.2. Jupyter Notebooks
@@ -27,7 +27,7 @@ conda activate vehicle_counter
 ```
 This step assumes you have already installed Anaconda in your computer
 
-> **Note:** You can neglect the above two instructions if you are NOT working in a virtual envirenement.
+> **Note:** You can neglect the above two instructions if you are NOT working in a virtual environment.
 
 ### Step 2: Upgrade pip and Install Dependencies
 Clone the repository and ensure that vehicle_counting_CV is set as your working directory if you haven't done so already.
@@ -159,7 +159,7 @@ print(f"The average time per frame required for the COUNTING step is: {profilers
 ## 1.3. Bash/Linux Commands
 Follow these steps to set up and run the application via Bash/Linux commands.
 
-### Step 1: Create Virtual Environment
+### Step 1: Create a Virtual Environment
 Open a terminal and run the following commands to create and activate a virtual environment named `vehicle_counter`:
 ```bash
 python -m venv vehicle_counter
@@ -191,7 +191,7 @@ If you prompt args.save to **True** please check the results saved in folder **\
 
 This repository offers a wide range of configurable features to tailor the counting process to your specific use-case. You can customize the algorithm with various arguments, select your preferred detector, tracker, or counting approach, and flexibly set the counting lines using percentages. Additionally, you can apply spatial masks to focus on specific areas of your video frames and more.
 
-To explore and understand these configurable arguments in detail, please execute the following commnd:
+To explore and understand these configurable arguments in detail, please execute the following command:
 
 
 
