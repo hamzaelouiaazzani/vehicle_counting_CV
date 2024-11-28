@@ -147,7 +147,6 @@ print(f"The time required for the POS-PROCESSING step is: {profilers[2].t}")
 print(f"The time required for the TRACKING step is: {profilers[3].t}")
 print(f"The time required for the COUNTING step is: {profilers[4].t}")
 ```
-
 ```python
 print(f"The average time per frame required for the PRE-PROCESSING step is: {profilers[0].dt} ")
 print(f"The average time per frame required for the DETECTION (Inference) step is: {profilers[1].dt} ")
