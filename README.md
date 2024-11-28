@@ -154,7 +154,7 @@ print(f"The average time per frame required for the DETECTION (Inference) step i
 print(f"The average time per frame required for the POS-PROCESSING step is: {profilers[2].dt}")
 print(f"The average time per frame required for the TRACKING step is: {profilers[3].dt}")
 print(f"The average time per frame required for the COUNTING step is: {profilers[4].dt}")
-```python
+```
 
 ## 1.3. Bash/Linux Commands
 Follow these steps to set up and run the application via Bash/Linux commands.
