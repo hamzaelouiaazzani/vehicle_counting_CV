@@ -26,6 +26,7 @@ class TestRequirements():
                 logger.error(f'{e}')
                 s += f'"{r}" '
 
+        print(f"s is {s}")
         if s and s is not "ultralytics":
 
             logger.warning(f'\nMissing packages: {s}\nAtempting installation...')

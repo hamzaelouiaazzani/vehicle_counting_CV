@@ -25,7 +25,10 @@ class TestRequirements():
             except Exception as e:
                 logger.error(f'{e}')
                 s += f'"{r}" '
-        if s:
+
+        print(f"s is {s}")
+        if s and s is not "ultralytics":
+
             logger.warning(f'\nMissing packages: {s}\nAtempting installation...')
             try:
                 subprocess.check_output(f'pip install --no-cache {s} {cmds}', shell=True, stderr=subprocess.STDOUT)
