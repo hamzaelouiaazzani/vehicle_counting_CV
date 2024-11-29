@@ -13,7 +13,6 @@ __tr = TestRequirements()
 local_path = ROOT / 'ultralytics'
 __tr.check_packages(local_path,)
 
-
 from counting.count import counter_YOLO
 
 from ultralytics.utils import LOGGER , ops , colorstr

@@ -38,6 +38,9 @@ class TestRequirements():
     def check_packages(self, requirements, cmds=''):
         """Test that each required package is available."""
         missing_packages = []
+        
+        print(f"requirements are: {requirements}")
+        
         for r in requirements:
             r = str(r)
             if os.path.isdir(r):  # Check if the requirement is a local directory
