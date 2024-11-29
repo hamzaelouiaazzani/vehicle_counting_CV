@@ -4,6 +4,15 @@ import cv2
 from boxmot import TRACKERS
 from boxmot.tracker_zoo import create_tracker
 from boxmot.utils import ROOT
+from boxmot.utils.checks import TestRequirements
+
+
+
+
+__tr = TestRequirements()
+local_path = ROOT / 'root/ultralytics'
+__tr.check_packages((str(local_path),))
+
 
 from counting.count import counter_YOLO
 
