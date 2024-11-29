@@ -9,9 +9,9 @@ from boxmot.utils.checks import TestRequirements
 
 
 
-__tr = TestRequirements()
-local_path = 'ultralytics'
-__tr.check_packages((local_path,))
+# __tr = TestRequirements()
+# local_path = 'ultralytics'
+# __tr.check_packages((local_path,))
 
 from counting.count import counter_YOLO
 
