@@ -194,6 +194,7 @@ Follow these steps to set up and run the repository on a NANO JETSON Developer K
 Download cuSPARSElt to enable GPU usage with PyTorch and TorchVision:
 - Visit the following link: [cuSPARSElt Downloads](https://developer.nvidia.com/cusparselt-downloads?target_os=Linux&target_arch=aarch64-jetson&Compilation=Native&Distribution=Ubuntu&target_version=22.04&target_type=deb_network)
 - Ensure the file is compatible with your setup.
+- Make sure the file `cuda-keyring_1.1-1_all.deb` (or a similar one) is successfully downloaded to your JETSON NANO Kit root: 
 
 ### Step 2: Create and Activate a Virtual Environment
 1. Create a new virtual environment:
@@ -213,7 +214,12 @@ Refer to the following NVIDIA forum for compatible PyTorch and TorchVision Wheel
 Download the following files:
 - PyTorch Wheel: `torch-2.3.0-cp310-cp310-linux_aarch64.whl`
 - TorchVision Wheel: `torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl`
-- Ensure compatibility with JetPack 6.1, Ubuntu 22.04, CUDA 12.6, and Jetson Linux L4T R36.4.
+- These files are compatible with JetPack 6.1, Ubuntu 22.04, CUDA 12.6, and Jetson Linux L4T R36.4.
+
+If these versions do not work, refer back to the forum for other compatible versions. If no prebuilt versions are suitable, you can build PyTorch and TorchVision from source by using these repositories:
+- [PyTorch Source Repository]( https://github.com/pytorch/pytorch)
+- [TorchVision Source Repository](https://github.com/pytorch/vision)
+
 
 ### Step 5: Clone the Repository
 Clone the repository to your Jetson Kit:
@@ -236,7 +242,7 @@ Run the following commands to confirm installation:
 python3 -c "import torch; print('PyTorch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available())"
 python3 -c "import torchvision; print('TorchVision version:', torchvision.__version__)"
 ```
-If new PyTorch and TorchVision Wheel files are successfully installed, the output should indicate `CUDA available: True`.
+The installation of PyTorch and TorchVision using the previous instructions enables only CPU functionality on your NANO Jetson Kit, not GPU support. To confirm this, run the following command. If GPU is not enabled, it will display “CUDA available: False”.
 
 ### Step 8: Enable GPU Support
 Install the appropriate PyTorch and TorchVision versions for GPU support:
