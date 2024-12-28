@@ -153,10 +153,6 @@ print(f"The average time per frame required for the POS-PROCESSING step is: {pro
 print(f"The average time per frame required for the TRACKING step is: {profilers[3].dt}")
 print(f"The average time per frame required for the COUNTING step is: {profilers[4].dt}")
 ```
-<<<<<<< HEAD
-
-=======
->>>>>>> 9799e8a68c219dbbac66721c8808f509517e5892
 
 ## 1.3. Bash/Linux Commands
 Follow these steps to set up and run the application via Bash/Linux commands.
@@ -189,6 +185,75 @@ Kindly before running the following counting script be sure you prompt your chos
 python3 counting/demo.py
 ```
 If you prompt args.save to **True** please check the results saved in folder **\runs\count** that is going to be created.
+
+## 1.4. Running the Repository on NANO JETSON Kit
+
+Follow these steps to set up and run the repository on a NANO JETSON Developer Kit with GPU support.
+
+### Step 1: Download cuSPARSElt
+Download cuSPARSElt to enable GPU usage with PyTorch and TorchVision:
+- Visit the following link: [cuSPARSElt Downloads](https://developer.nvidia.com/cusparselt-downloads?target_os=Linux&target_arch=aarch64-jetson&Compilation=Native&Distribution=Ubuntu&target_version=22.04&target_type=deb_network)
+- Ensure the file is compatible with your setup.
+
+### Step 2: Create and Activate a Virtual Environment
+1. Create a new virtual environment:
+   ```bash
+   python3 -m venv my_env
+   ```
+2. Activate the virtual environment:
+   ```bash
+   source my_env/bin/activate
+   ```
+
+### Step 3: Check the NVIDIA Forum
+Refer to the following NVIDIA forum for compatible PyTorch and TorchVision Wheel files:
+- [PyTorch for Jetson](https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048)
+
+### Step 4: Download Required Files
+Download the following files:
+- PyTorch Wheel: `torch-2.3.0-cp310-cp310-linux_aarch64.whl`
+- TorchVision Wheel: `torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl`
+- Ensure compatibility with JetPack 6.1, Ubuntu 22.04, CUDA 12.6, and Jetson Linux L4T R36.4.
+
+### Step 5: Clone the Repository
+Clone the repository to your Jetson Kit:
+```bash
+git clone https://github.com/hamzaelouiaazzani/vehicle_counting_CV.git
+cd vehicle_counting_CV
+```
+
+### Step 6: Install Dependencies
+Upgrade pip, setuptools, and wheel, then install the repository dependencies:
+```bash
+pip install --upgrade pip setuptools wheel
+pip install -e .
+cd ..
+```
+
+### Step 7: Verify Installation
+Run the following commands to confirm installation:
+```bash
+python3 -c "import torch; print('PyTorch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available())"
+python3 -c "import torchvision; print('TorchVision version:', torchvision.__version__)"
+```
+If new PyTorch and TorchVision Wheel files are successfully installed, the output should indicate `CUDA available: True`.
+
+### Step 8: Enable GPU Support
+Install the appropriate PyTorch and TorchVision versions for GPU support:
+```bash
+pip3 install torch-2.3.0-cp310-cp310-linux_aarch64.whl
+pip3 install torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl
+pip install numpy==1.24.4
+```
+
+### Step 9: Run the Application
+Run the counting script:
+```bash
+cd vehicle_counting_CV
+python3 counting/demo.py
+```
+Ensure that you configure the desired arguments in the `demo.py` file before running. Results will be saved in the `runs/count` folder if `args.save` is set to `True`.
+
 
 # 2. Configuring Your Arguments for Optimal Counting Performance
 
