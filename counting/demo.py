@@ -17,6 +17,8 @@ args.line_point21 = (0.6, 0.0)
 args.line_point22 = (0.7, 1.0)
 args.use_mask = True
 
+args.save = False
+
 
 counter_yolo , profilers , results  = run(args)
 
@@ -40,14 +42,14 @@ def tensor_to_dict(count_per_class):
 print(f"The number of vehicles per type counted by the algorithm is: {tensor_to_dict(counter_yolo.count_per_class)}")
 
 
-print(f"The time required for the PRE-PROCESSING step is: {profilers[0].t} ")
-print(f"The time required for the DETECTION (Inference) step is: {profilers[1].t} ")
-print(f"The time required for the POS-PROCESSING step is: {profilers[2].t}")
-print(f"The time required for the TRACKING step is: {profilers[3].t}")
-print(f"The time required for the COUNTING step is: {profilers[4].t}")
+print(f"The time required for the PRE-PROCESSING step is: {profilers[0].t} seconds.")
+print(f"The time required for the DETECTION (Inference) step is: {profilers[1].t} seconds.")
+print(f"The time required for the POS-PROCESSING step is: {profilers[2].t} s")
+print(f"The time required for the TRACKING step is: {profilers[3].t} s.")
+print(f"The time required for the COUNTING step is: {profilers[4].t} s.")
 
-print(f"The average time per frame required for the PRE-PROCESSING step is: {profilers[0].dt} ")
-print(f"The average time per frame required for the DETECTION (Inference) step is: {profilers[1].dt} ")
-print(f"The average time per frame required for the POS-PROCESSING step is: {profilers[2].dt}")
-print(f"The average time per frame required for the TRACKING step is: {profilers[3].dt}")
-print(f"The average time per frame required for the COUNTING step is: {profilers[4].dt}")
+print(f"The average time per frame required for the PRE-PROCESSING step is: {profilers[0].dt * 1000} ms.")
+print(f"The average time per frame required for the DETECTION (Inference) step is: {profilers[1].dt * 1000} ms.")
+print(f"The average time per frame required for the POS-PROCESSING step is: {profilers[2].dt * 1000} ms.")
+print(f"The average time per frame required for the TRACKING step is: {profilers[3].dt * 1000} ms.")
+print(f"The average time per frame required for the COUNTING step is: {profilers[4].dt * 1000} ms.")
