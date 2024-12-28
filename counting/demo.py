@@ -19,3 +19,35 @@ args.use_mask = True
 
 
 counter_yolo , profilers , results  = run(args)
+
+# Counting Results
+print(f"The number of vehicles counted by the algorithm is: {counter_yolo.counter}")
+
+
+
+def tensor_to_dict(count_per_class):
+    # Dictionary keys for the selected vehicle types
+    vehicle_types = ["bicycle", "car", "motorcycle", "bus", "truck"]
+
+    # Indices corresponding to the vehicle types in the tensor
+    indices = [1, 2, 3, 5, 7]
+
+    # Create the dictionary
+    vehicle_counts = {vehicle: int(count_per_class[idx].item()) for vehicle, idx in zip(vehicle_types, indices)}
+
+    return vehicle_counts
+
+print(f"The number of vehicles per type counted by the algorithm is: {tensor_to_dict(counter_yolo.count_per_class)}")
+
+
+print(f"The time required for the PRE-PROCESSING step is: {profilers[0].t} ")
+print(f"The time required for the DETECTION (Inference) step is: {profilers[1].t} ")
+print(f"The time required for the POS-PROCESSING step is: {profilers[2].t}")
+print(f"The time required for the TRACKING step is: {profilers[3].t}")
+print(f"The time required for the COUNTING step is: {profilers[4].t}")
+
+print(f"The average time per frame required for the PRE-PROCESSING step is: {profilers[0].dt} ")
+print(f"The average time per frame required for the DETECTION (Inference) step is: {profilers[1].dt} ")
+print(f"The average time per frame required for the POS-PROCESSING step is: {profilers[2].dt}")
+print(f"The average time per frame required for the TRACKING step is: {profilers[3].dt}")
+print(f"The average time per frame required for the COUNTING step is: {profilers[4].dt}")
