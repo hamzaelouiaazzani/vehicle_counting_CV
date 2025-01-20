@@ -17,6 +17,8 @@ Follow the instructions of the notebook. Feel Free to explore the code and make 
 
 
 ## 1.2. Jupyter Notebooks
+
+Note: In case you want to use the Geoforce GPU in your computer to accelerate to speed up processing, kindly install CUDA in your computer 
 Follow these steps to set up and run the application in Jupyter Notebooks.
 
 ### Step 1: Create Virtual Environment (Bash/Anaconda Prompt)
@@ -60,8 +62,22 @@ print(f"Cuda availaibility: {torch.cuda.is_available()}")
 if torch.cuda.is_available():
     print(f"Setup complete. Using torch {torch.__version__} ({torch.cuda.get_device_properties(0).name if torch.cuda.is_available() else 'CPU'})")
 ```
+### Step 5: Using a GeForce GPU in your computer for Accelerated Processing  
 
-### Step 5: Run counting
+To utilize your computer's GeForce GPU to speed up processing, follow these steps:  
+
+1. **Install CUDA:**  
+   Download and install the CUDA toolkit compatible with your GPU from the [NVIDIA CUDA Toolkit Archive](https://developer.nvidia.com/cuda-12-4-0-download-archive).  
+
+2. **Install PyTorch with GPU Support:**  
+   Visit [PyTorch's Get Started Guide](https://pytorch.org/get-started/locally/) to install the appropriate version of PyTorch for your system with GPU (CUDA) support.  
+
+#### Notes  
+- Ensure your GPU driver is up-to-date before installing CUDA.  
+- Follow the instructions on the linked pages carefully to avoid compatibility issues.  
+
+
+### Step 6: Run counting
 
 **Import counting files:**
 
@@ -178,8 +194,21 @@ Run the following commands to verify the installation of PyTorch and check if CU
 ```bash
 python -c "import torch; print(f'Setup complete. Using torch {torch.__version__} ({torch.cuda.get_device_properties(0).name if torch.cuda.is_available() else 'CPU'})')"
 ```
+### Step 4: Using a GeForce GPU in your computer for Accelerated Processing  
 
-### Step 4: Run counting: 
+To utilize your computer's GeForce GPU to speed up processing, follow these steps:  
+
+1. **Install CUDA:**  
+   Download and install the CUDA toolkit compatible with your GPU from the [NVIDIA CUDA Toolkit Archive](https://developer.nvidia.com/cuda-12-4-0-download-archive).  
+
+2. **Install PyTorch with GPU Support:**  
+   Visit [PyTorch's Get Started Guide](https://pytorch.org/get-started/locally/) to install the appropriate version of PyTorch for your system with GPU (CUDA) support.  
+
+#### Notes  
+- Ensure your GPU driver is up-to-date before installing CUDA.  
+- Follow the instructions on the linked pages carefully to avoid compatibility issues.  
+
+### Step 5: Run counting: 
 Kindly before running the following counting script be sure you prompt your chosen **args** configuration within the demo.py file (remember you can edit your configuration as you want):
 ```bash
 python3 counting/demo.py
