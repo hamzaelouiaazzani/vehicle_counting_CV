@@ -22,7 +22,7 @@ args.line_vicinity = 1.5
 
 args.use_mask = False
 
-args.save = False
+args.save = True
 
 ti = time.time()
 counter_yolo , profilers , results  = run(args)
