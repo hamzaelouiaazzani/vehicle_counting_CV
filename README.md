@@ -325,8 +325,8 @@ print(args.__doc__)
                               Default is True.
             verbose (bool): Whether to enable verbose logging.
                             Default is False.
-            counting_approach (str): Approach for counting vehicles. Options include 'tracking_with_line_vicinity' , 'tracking_with_line_crossing', 'tracking_with_line_crossing_vicinity', 'tracking_with_two_lines', 'detection_only'.
-                                     Default is 'tracking_with_two_lines'.
+            counting_approach (str): Approach for counting vehicles. Options include 'detection_only', 'tracking_without_line', 'tracking_with_line_vicinity', 'tracking_with_line_crossing', 'tracking_with_line_crossing_vicinity' ,  'tracking_with_two_lines'.
+                            Default is 'tracking_with_two_lines'.
                                      
             line_point11 (tuple): Coordinates of the first point of the first line. Values between 0 and 1 indicate percentages.
                                   For example, (0.4, 0.0) means 40% of the frame width (pixel 0.4 * image width) and 0% of the frame height (pixel 0).
