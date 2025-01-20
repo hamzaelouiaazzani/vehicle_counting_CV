@@ -11,12 +11,15 @@ args.project = "runs/count"
 args.vid_stride = 1
 args.verbose = True
 
-args.counting_approach = "tracking_with_two_lines"
-args.line_point11 = (0.4, 0.0)
-args.line_point12 = (0.4, 1.0)
-args.line_vicinity = 0.05
-args.line_point21 = (0.6, 0.0)
-args.line_point22 = (0.7, 1.0)
+args.counting_approach = "tracking_with_line_vicinity"        # tracking_with_line_vicinity , tracking_with_line_crossing, tracking_with_line_crossing_vicinity, tracking_with_two_lines
+
+args.line_point11 = (0.0, 0.25)
+args.line_point12 = (1.0, 0.75)
+args.line_vicinity = 1.5
+
+#args.line_point21 = (0.6, 0.0)
+#args.line_point22 = (0.7, 1.0)
+
 args.use_mask = False
 
 args.save = False
