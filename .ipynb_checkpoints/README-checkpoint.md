@@ -10,7 +10,6 @@ Before we begin, it's important to acknowledge the foundations upon which this p
 * **Object Tracking:** This project utilizes the [boxmot](https://github.com/mikel-brostrom/boxmot) repository for object tracking, also licensed under the AGPL license.
 * **Vehicle Counting:** This notebook is based on the [vehicle_counting_CV](https://github.com/hamzaelouiaazzani/vehicle_counting_CV) repository (My repository), which is also licensed under the AGPL license.
 
-
 This notebook provides step-by-step instructions to set up and run the vehicle counting application on four different platforms: Google Colab, Jupyter Notebooks, and via Bash/Linux commands and in  NANO JETSON Kit.
 ## 1.1. Google Colab
 If you prefer working with Colab notebooks, kindly click on the icon below to open the notebook in Google Colab:
@@ -27,7 +26,6 @@ If you prefer working with Colab notebooks, kindly click on the icon below to op
 
 Follow the instructions of the notebook. Feel Free to explore the code and make any customizations for you. The notebook is designed for you for this!
 
-
 ## 1.2. Jupyter Notebooks
 
 Note: In case you want to use the Geoforce GPU in your computer to accelerate to speed up processing, kindly install CUDA in your computer 
@@ -41,12 +39,12 @@ To utilize your computer's GeForce GPU to speed up processing, follow these step
    Download and install the CUDA toolkit compatible with your GPU from the [NVIDIA CUDA Toolkit Archive](https://developer.nvidia.com/cuda-12-4-0-download-archive).  
 
 2. **Install PyTorch with GPU Support:**  
-   Visit [PyTorch's Get Started Guide](https://pytorch.org/get-started/locally/) to install the appropriate version of PyTorch for your system with GPU (CUDA) support.  
+   Visit [PyTorch's Get Started Guide](https://pytorch.org/get-started/locally/) to install the appropriate version of PyTorch for your system with GPU (CUDA) support.
 
 #### Notes  
 - Ensure your GPU driver is up-to-date before installing CUDA.  
 - Follow the instructions on the linked pages carefully to avoid compatibility issues.
-- 
+
 ### Step 1: Create Virtual Environment (Bash/Anaconda Prompt)
 Open a Bash or Anaconda Prompt and run the following commands to create and activate a virtual environment named `vehicle_counter`:
 ```bash
@@ -208,7 +206,7 @@ python -m venv vehicle_counter
 source vehicle_counter/bin/activate
 ```
 
-### Step 2: Upgrade pip and Install Dependencies
+### Step 2: Clone vehicle counting repository, Upgrade Pip and Install Dependencies
 Run the following commands to upgrade pip, setuptools, and wheel, and install the repository dependencies:
 ```bash
 pip install --upgrade pip setuptools wheel
