@@ -164,7 +164,7 @@ def tensor_to_dict(count_per_class):
 print(f"The number of vehicles per type counted by the algorithm is: {tensor_to_dict(counter_yolo.count_per_class)}")
 ```
 
-**Measure the time taken by each phase of your vehicle counting systm's pipeline for the video:**
+**Measure the time taken by each phase of your vehicle counting system's pipeline for the video:**
 
 ```python
 print(f"The time required for the PRE-PROCESSING step is: {profilers[0].t} ")
