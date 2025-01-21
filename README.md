@@ -3,7 +3,7 @@ This notebook provides step-by-step instructions to set up and run the vehicle c
 ## 1.1. Google Colab
 If you prefer working with Colab notebooks, kindly click on the icon below to open the notebook in Google Colab:
 
-[![Open In Colab](pictures/colab_icon.png)](https://colab.research.google.com/drive/1ZCVPWJOPqZMeieotSRxd9JSj-YZUI12j?usp=sharing)
+[![Open the Vehicle Counting Notebook In Colab](pictures/colab_icon.png)](https://colab.research.google.com/drive/1XNPEu142VLqV9YAFAkyJfvUbZsiPrP4q?usp=sharing)
 
 **Note:** Please don't forget to set the runtime type to **GPU (T4)** in Colab for optimal performance.
 
