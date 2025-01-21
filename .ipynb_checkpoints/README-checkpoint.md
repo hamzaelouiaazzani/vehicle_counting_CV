@@ -11,7 +11,7 @@ Before we begin, it's important to acknowledge the foundations upon which this p
 * **Vehicle Counting:** This notebook is based on the [vehicle_counting_CV](https://github.com/hamzaelouiaazzani/vehicle_counting_CV) repository (My repository), which is also licensed under the AGPL license.
 
 
-This notebook provides step-by-step instructions to set up and run the vehicle counting application on three different platforms: Google Colab, Jupyter Notebooks, and via Bash/Linux commands.
+This notebook provides step-by-step instructions to set up and run the vehicle counting application on four different platforms: Google Colab, Jupyter Notebooks, and via Bash/Linux commands and in  NANO JETSON Kit.
 ## 1.1. Google Colab
 If you prefer working with Colab notebooks, kindly click on the icon below to open the notebook in Google Colab:
 
