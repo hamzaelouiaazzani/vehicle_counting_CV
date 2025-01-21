@@ -172,7 +172,10 @@ print(f"The time required for the DETECTION (Inference) step is: {profilers[1].t
 print(f"The time required for the POS-PROCESSING step is: {profilers[2].t}")
 print(f"The time required for the TRACKING step is: {profilers[3].t}")
 print(f"The time required for the COUNTING step is: {profilers[4].t}")
-
+print("-------------------------------------------------------------------------------------------")
+overall_time = profilers[0].t + profilers[1].t + profilers[2].t + profilers[3].t + profilers[4].t
+print(f"The overall time required for the whole counting pipeline with this system (software algorithms + hardware) is: {overall_time}")
+print("-------------------------------------------------------------------------------------------")
 print(f"The average time per frame required for the PRE-PROCESSING step is: {profilers[0].dt} ")
 print(f"The average time per frame required for the DETECTION (Inference) step is: {profilers[1].dt} ")
 print(f"The average time per frame required for the POS-PROCESSING step is: {profilers[2].dt}")
