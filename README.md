@@ -33,6 +33,20 @@ Follow the instructions of the notebook. Feel Free to explore the code and make 
 Note: In case you want to use the Geoforce GPU in your computer to accelerate to speed up processing, kindly install CUDA in your computer 
 Follow these steps to set up and run the application in Jupyter Notebooks.
 
+### Using a GeForce GPU in your computer for Accelerated Processing  
+
+To utilize your computer's GeForce GPU to speed up processing, follow these steps:  
+
+1. **Install CUDA:**  
+   Download and install the CUDA toolkit compatible with your GPU from the [NVIDIA CUDA Toolkit Archive](https://developer.nvidia.com/cuda-12-4-0-download-archive).  
+
+2. **Install PyTorch with GPU Support:**  
+   Visit [PyTorch's Get Started Guide](https://pytorch.org/get-started/locally/) to install the appropriate version of PyTorch for your system with GPU (CUDA) support.  
+
+#### Notes  
+- Ensure your GPU driver is up-to-date before installing CUDA.  
+- Follow the instructions on the linked pages carefully to avoid compatibility issues.
+- 
 ### Step 1: Create Virtual Environment (Bash/Anaconda Prompt)
 Open a Bash or Anaconda Prompt and run the following commands to create and activate a virtual environment named `vehicle_counter`:
 ```bash
@@ -43,7 +57,7 @@ This step assumes you have already installed Anaconda in your computer
 
 > **Note:** You can neglect the above two instructions if you are NOT working in a virtual environment.
 
-### Step 2: Upgrade pip and Install Dependencies
+### Step 2: Clone the Vehicle Counting Repository
 Clone the repository and ensure that vehicle_counting_CV is set as your working directory if you haven't done so already.
 
 ```python
@@ -74,22 +88,8 @@ print(f"Cuda availaibility: {torch.cuda.is_available()}")
 if torch.cuda.is_available():
     print(f"Setup complete. Using torch {torch.__version__} ({torch.cuda.get_device_properties(0).name if torch.cuda.is_available() else 'CPU'})")
 ```
-### Step 5: Using a GeForce GPU in your computer for Accelerated Processing  
 
-To utilize your computer's GeForce GPU to speed up processing, follow these steps:  
-
-1. **Install CUDA:**  
-   Download and install the CUDA toolkit compatible with your GPU from the [NVIDIA CUDA Toolkit Archive](https://developer.nvidia.com/cuda-12-4-0-download-archive).  
-
-2. **Install PyTorch with GPU Support:**  
-   Visit [PyTorch's Get Started Guide](https://pytorch.org/get-started/locally/) to install the appropriate version of PyTorch for your system with GPU (CUDA) support.  
-
-#### Notes  
-- Ensure your GPU driver is up-to-date before installing CUDA.  
-- Follow the instructions on the linked pages carefully to avoid compatibility issues.  
-
-
-### Step 6: Run counting
+### Step 5: Run counting
 
 **Import counting files:**
 
@@ -183,7 +183,22 @@ print(f"The average time per frame required for the COUNTING step is: {profilers
 ```
 
 ## 1.3. Bash/Linux Commands
-Follow these steps to set up and run the application via Bash/Linux commands.
+
+Note: In case you want to use the Geoforce GPU in your computer to accelerate to speed up processing, kindly install CUDA in your computer and follow these steps to set up and run the application via Bash/Linux commands.
+
+### Using a GeForce GPU in your computer for Accelerated Processing  
+
+To utilize your computer's GeForce GPU to speed up processing, follow these steps:  
+
+1. **Install CUDA:**  
+   Download and install the CUDA toolkit compatible with your GPU from the [NVIDIA CUDA Toolkit Archive](https://developer.nvidia.com/cuda-12-4-0-download-archive).  
+
+2. **Install PyTorch with GPU Support:**  
+   Visit [PyTorch's Get Started Guide](https://pytorch.org/get-started/locally/) to install the appropriate version of PyTorch for your system with GPU (CUDA) support.  
+
+#### Notes  
+- Ensure your GPU driver is up-to-date before installing CUDA.  
+- Follow the instructions on the linked pages carefully to avoid compatibility issues.
 
 ### Step 1: Create a Virtual Environment
 Open a terminal and run the following commands to create and activate a virtual environment named `vehicle_counter`:
@@ -206,26 +221,13 @@ Run the following commands to verify the installation of PyTorch and check if CU
 ```bash
 python -c "import torch; print(f'Setup complete. Using torch {torch.__version__} ({torch.cuda.get_device_properties(0).name if torch.cuda.is_available() else 'CPU'})')"
 ```
-### Step 4: Using a GeForce GPU in your computer for Accelerated Processing  
 
-To utilize your computer's GeForce GPU to speed up processing, follow these steps:  
-
-1. **Install CUDA:**  
-   Download and install the CUDA toolkit compatible with your GPU from the [NVIDIA CUDA Toolkit Archive](https://developer.nvidia.com/cuda-12-4-0-download-archive).  
-
-2. **Install PyTorch with GPU Support:**  
-   Visit [PyTorch's Get Started Guide](https://pytorch.org/get-started/locally/) to install the appropriate version of PyTorch for your system with GPU (CUDA) support.  
-
-#### Notes  
-- Ensure your GPU driver is up-to-date before installing CUDA.  
-- Follow the instructions on the linked pages carefully to avoid compatibility issues.  
-
-### Step 5: Run counting: 
+### Step 4: Run counting: 
 Kindly before running the following counting script be sure you prompt your chosen **args** configuration within the demo.py file (remember you can edit your configuration as you want):
 ```bash
 python3 counting/demo.py
 ```
-If you prompt args.save to **True** please check the results saved in folder **\runs\count** that is going to be created.
+If you set args.save to **True** please check the results saved in folder **\runs\count** that is going to be created.
 
 ## 1.4. Running the Repository on NANO JETSON Kit
 
