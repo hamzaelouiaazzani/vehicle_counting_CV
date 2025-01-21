@@ -146,7 +146,7 @@ counter_yolo.video_attributes
 print(f"The number of vehicles counted by the algorithm is: {counter_yolo.counter}")
 ```
 
-Counts per vehicle type:
+**Counts per vehicle type:**
 
 ```python
 def tensor_to_dict(count_per_class):
